@@ -35,10 +35,24 @@ export default defineEventHandler(async (event) => {
         await writeFile(selfiePath, selfieFile.data);
         await writeFile(clothingPath, clothingFile.data);
 
+        // 获取自拍图片的尺寸
+        const selfieMetadata = await sharp(selfiePath).metadata();
+        const selfieWidth = selfieMetadata.width || 0;
+        const selfieHeight = selfieMetadata.height || 0;
+
+        // 调整衣服图片的尺寸
+        const resizedClothingBuffer = await sharp(clothingPath)
+           .resize({
+                width: selfieWidth,
+                height: selfieHeight,
+                fit: 'inside' // 确保衣服图片适应自拍图片的尺寸
+            })
+           .toBuffer();
+
         // 使用 sharp 处理图片
         const compositeImage = await sharp(selfiePath)
            .composite([{
-                input: clothingPath,
+                input: resizedClothingBuffer,
                 // 这里需要根据实际情况调整衣服的位置和大小
                 top: 0,
                 left: 0
