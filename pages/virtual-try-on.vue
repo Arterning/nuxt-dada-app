@@ -126,9 +126,33 @@ const handleClothingSelect = (event) => {
   }
 }
 
-const handleTryOn = () => {
-  // TODO: 实现换装逻辑
-  console.log('生成换装效果')
+const handleTryOn = async () => {
+  try {
+    const formData = new FormData()
+    // 从 data URL 转换为 Blob 对象
+    const selfieBlob = await (await fetch(selfieImage.value)).blob()
+    const clothingBlob = await (await fetch(clothingImage.value)).blob()
+
+    formData.append('selfie', selfieBlob, 'selfie.jpg')
+    formData.append('clothing', clothingBlob, 'clothing.jpg')
+
+    const { data, error } = await useFetch('/api/virtual', {
+      method: 'POST',
+      body: formData,
+      responseType: 'blob'
+    })
+
+    if (error.value) {
+      console.error('调用 API 出错:', error.value)
+      return
+    }
+
+    const blob = data.value
+    const url = URL.createObjectURL(blob)
+    resultImage.value = url
+  } catch (err) {
+    console.error('处理请求时出错:', err)
+  }
 }
 
 const handleDownload = () => {
