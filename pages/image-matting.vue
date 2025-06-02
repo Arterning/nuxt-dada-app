@@ -67,13 +67,25 @@
         </div>
       </div>
     </div>
+    <div v-if="mattedImage" class="mt-8">
+      <h2 class="text-2xl font-bold mb-4">抠图结果</h2>
+      <div class="bg-gray-800 rounded-lg p-4 flex items-center justify-center">
+        <img 
+          :src="mattedImage" 
+          class="max-w-full max-h-[500px] object-contain" 
+          alt="Matted image"
+        >
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useFetch } from '#app'
 
 const selectedImage = ref(null)
+const mattedImage = ref(null)
 
 const handleImageSelect = (event) => {
   const file = event.target.files[0]
@@ -86,9 +98,34 @@ const handleImageSelect = (event) => {
   }
 }
 
-const handleMatting = () => {
-  // TODO: 实现抠图逻辑
-  console.log('抠图处理')
+const handleMatting = async () => {
+  try {
+    if (!selectedImage.value) {
+      console.error('请先选择一张图片')
+      return
+    }
+
+    const formData = new FormData()
+    const blob = await (await fetch(selectedImage.value)).blob()
+    formData.append('image', blob, 'uploaded_image.jpg')
+
+    const { data, error } = await useFetch('/api/image-matting', {
+      method: 'POST',
+      body: formData,
+      responseType: 'blob'
+    })
+
+    if (error.value) {
+      console.error('调用抠图接口出错:', error.value)
+      return
+    }
+
+    const blobResult = data.value
+    const url = URL.createObjectURL(blobResult)
+    mattedImage.value = url
+  } catch (err) {
+    console.error('处理抠图请求时出错:', err)
+  }
 }
 
 const handleAddBackground = () => {
