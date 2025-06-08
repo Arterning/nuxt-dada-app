@@ -1,4 +1,6 @@
 <script setup>
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/vue'
+
 </script>
 
 <template>
@@ -14,7 +16,17 @@
             :class="{ 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-indigo-500': $route.path === '/virtual' }">换装</RouterLink>
     <RouterLink to="/clothes" class="text-white hover:text-orange-600 px-4 py-2 rounded-full transition-all duration-300"
             :class="{ 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-indigo-500': $route.path === '/clothes' }">我的服装</RouterLink>
-  </nav>
+  
+            <div class="ml-auto">
+                <SignedOut>
+                  <SignInButton class="p-2"/>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+            </div>
+      
+    </nav>
   <main>
     <RouterView />
   </main>

@@ -9,6 +9,9 @@ import MattingView from './pages/image-matting.vue'
 import VirtualTryOn from './pages/virtual-try-on.vue'
 import ClothesList from './pages/clothe-list.vue'
 
+import { clerkPlugin } from '@clerk/vue'
+
+
 const routes = [
   { path: '/', component: HomeView },
   { path: '/matting', component: MattingView },
@@ -21,4 +24,11 @@ const router = createRouter({
   routes,
 })
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App)
+
+app.use(router)
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+app.use(clerkPlugin, { publishableKey: PUBLISHABLE_KEY })
+
+app.mount('#app')
