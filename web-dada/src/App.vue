@@ -19,7 +19,9 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/vue'
   
             <div class="ml-auto">
                 <SignedOut>
-                  <SignInButton class="p-2"/>
+                  <SignInButton class="p-2 cursor-pointer rounded-md">
+                     <button>注册</button>
+                  </SignInButton>
                 </SignedOut>
                 <SignedIn>
                   <UserButton />
