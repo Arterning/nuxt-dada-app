@@ -7,6 +7,8 @@ const clothes = ref([])
 const searchQuery = ref('')
 const isModalOpen = ref(false)
 const currentClothe = ref(null)
+// 新增：文件上传引用
+const fileInput = ref(null)
 
 // 表单数据
 const formData = ref({
@@ -31,6 +33,20 @@ const filteredClothes = computed(() => {
     clothe.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
+
+// 新增：文件上传函数
+async function uploadFile(file) {
+  if (!file) return null;
+  const fileName = `${Date.now()}-${file.name}`;
+  const { error, data } = await supabase.storage.from('clothes').upload(fileName, file);
+  if (error) {
+    console.error('文件上传失败:', error);
+    return null;
+  }
+  const { publicURL } = supabase.storage.from('clothes').getPublicUrl(data.fullPath);
+  console.log('文件上传成功:', publicURL);
+  return publicURL;
+}
 
 // 打开模态框
 function openModal(clothe = null) {
@@ -61,6 +77,12 @@ function closeModal() {
 
 // 保存服装信息
 async function saveClothe() {
+  if (fileInput.value && fileInput.value.files[0]) {
+    const publicURL = await uploadFile(fileInput.value.files[0]);
+    if (publicURL) {
+      formData.value.image_url = publicURL;
+    }
+  }
   if (currentClothe.value) {
     // 更新现有服装
     await supabase.from('clothes').update(formData.value).eq('id', currentClothe.value.id)
@@ -152,9 +174,15 @@ onMounted(async () => {
             <label class="block mb-1">类别:</label>
             <input v-model="formData.category" class="w-full p-2 border border-gray-300 rounded">
           </div>
+          <!-- 删除图片链接输入项 -->
+          <!-- 新增文件上传按钮 -->
           <div class="mb-4">
-            <label class="block mb-1">图片 URL:</label>
-            <input v-model="formData.image_url" class="w-full p-2 border border-gray-300 rounded">
+            <label class="block mb-1">上传图片:</label>
+            <input 
+              ref="fileInput" 
+              type="file" 
+              class="w-full p-2 border border-gray-300 rounded"
+            />
           </div>
           <div class="mb-4">
             <label class="block mb-1">购买日期:</label>
