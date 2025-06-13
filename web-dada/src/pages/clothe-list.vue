@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { supabase } from '../lib/supabaseClient'
 
+
 const clothes = ref([])
 const searchQuery = ref('')
 const isModalOpen = ref(false)
@@ -43,8 +44,8 @@ function openModal(clothe = null) {
       category_name: '',
       category: '',
       image_url: '',
-      purchase_date: '',
-      price: '',
+      purchase_date: new Date(),
+      price: 0,
       purchase_link: '',
       washing_method: '',
       status: '已购买'
@@ -84,11 +85,11 @@ onMounted(async () => {
 
 <template>
   <div class="p-4">
-    <div class="flex mb-4">
+    <div class="flex mb-4 gap-3">
       <input 
         v-model="searchQuery" 
         placeholder="搜索服装..." 
-        class="w-full p-2 border border-gray-300 rounded-l focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-[50vw] p-2 border-b border-gray-300 rounded-l focus:outline-none focus:ring-blue-500 focus:border-blue-500"
       />
       <button 
         @click="openModal()" 
@@ -138,7 +139,7 @@ onMounted(async () => {
       <div class="fixed inset-0 bg-black opacity-50" @click="closeModal"></div>
       <div class="bg-slate-600 p-6 rounded-lg z-10 w-1/2">
         <h2 class="text-xl font-semibold mb-4">{{ currentClothe ? '编辑' : '创建' }}服装</h2>
-        <form @submit.prevent="saveClothe">
+        <form @submit.prevent="saveClothe" class=" grid grid-cols-2 gap-3">
           <div class="mb-4">
             <label class="block mb-1">名称:</label>
             <input v-model="formData.name" class="w-full p-2 border border-gray-300 rounded">
